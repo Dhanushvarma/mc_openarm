@@ -41,4 +41,13 @@ generate_urdf(openarm_v1 assets/robot/openarm_v1.0/urdf/openarm_v10.urdf.xacro
 generate_urdf(openarm_v2 assets/robot/openarm_v2.0/urdf/openarm_v20.urdf.xacro
               robot_preset:=default_bimanual)
 
+# Surfaces (rsdf/<robot name>/*.rsdf): the module points its rsdf_dir here
+set(MC_OPENARM_RSDF_DIR "${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/rsdf")
+install(DIRECTORY rsdf/ DESTINATION "${MC_OPENARM_RSDF_DIR}")
+
 add_subdirectory(src)
+
+include(CTest)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()

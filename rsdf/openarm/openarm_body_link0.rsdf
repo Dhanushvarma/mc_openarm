@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!-- Under the pedestal's foot (openarm_body_link0's origin), for mounting the robot on a mobile base with a contact.
+     The points are a stand-in square: a kinematic contact only uses the surface frame -->
+<robot name="openarm">
+  <planar_surface name="Base" link="openarm_body_link0">
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0" />
+    <points>
+      <point xy="-0.1 -0.1" />
+      <point xy="0.1 -0.1" />
+      <point xy="0.1 0.1" />
+      <point xy="-0.1 0.1" />
+    </points>
+    <material name="plastic" />
+  </planar_surface>
+</robot>

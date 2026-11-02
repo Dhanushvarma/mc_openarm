@@ -25,6 +25,11 @@ namespace mc_robots
 // end-effector mount body ("link7" -> "ee_base_link", now holding a
 // different, "pinch_gripper" end-effector instead of V1's parallel-jaw
 // gripper). See the armLink() helper in openarm.in.cpp.
+//
+// Each module name also exists with the FloatingBase suffix (e.g.
+// OpenArmV2FloatingBase): the same URDF and robot name with a free root at
+// openarm_body_link0, the pedestal's foot, to mount the robot on a mobile
+// base through a contact on its "Base" surface.
 enum class OpenArmVersion
 {
   V1,
@@ -46,7 +51,7 @@ inline std::string to_string(OpenArmVersion version)
 
 struct MC_ROBOTS_DLLAPI OpenArmRobotModule : public mc_rbdyn::RobotModule
 {
-  OpenArmRobotModule(const std::string & name, OpenArmVersion version);
+  OpenArmRobotModule(const std::string & name, OpenArmVersion version, bool fixed = true);
 };
 
 } // namespace mc_robots
@@ -57,7 +62,8 @@ extern "C"
   {
     // "OpenArm" is kept as an alias of "OpenArmV1" for existing configs
     // (e.g. etc/mc_rtc.yaml) that predate V2 support.
-    names = {"OpenArm", "OpenArmV1", "OpenArmV2"};
+    names = {
+        "OpenArm", "OpenArmV1", "OpenArmV2", "OpenArmFloatingBase", "OpenArmV1FloatingBase", "OpenArmV2FloatingBase"};
   }
   ROBOT_MODULE_API void destroy(mc_rbdyn::RobotModule * ptr)
   {
@@ -66,13 +72,17 @@ extern "C"
   ROBOT_MODULE_API mc_rbdyn::RobotModule * create(const std::string & n)
   {
     ROBOT_MODULE_CHECK_VERSION("OpenArm")
-    if(n == "OpenArm" || n == "OpenArmV1")
+    const std::string floatingSuffix = "FloatingBase";
+    const bool floating = n.size() > floatingSuffix.size()
+                          && n.compare(n.size() - floatingSuffix.size(), floatingSuffix.size(), floatingSuffix) == 0;
+    const std::string name = floating ? n.substr(0, n.size() - floatingSuffix.size()) : n;
+    if(name == "OpenArm" || name == "OpenArmV1")
     {
-      return new mc_robots::OpenArmRobotModule("openarm", mc_robots::OpenArmVersion::V1);
+      return new mc_robots::OpenArmRobotModule("openarm", mc_robots::OpenArmVersion::V1, !floating);
     }
-    else if(n == "OpenArmV2")
+    else if(name == "OpenArmV2")
     {
-      return new mc_robots::OpenArmRobotModule("openarm", mc_robots::OpenArmVersion::V2);
+      return new mc_robots::OpenArmRobotModule("openarm", mc_robots::OpenArmVersion::V2, !floating);
     }
     else
     {

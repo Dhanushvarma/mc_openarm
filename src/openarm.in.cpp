@@ -9,6 +9,8 @@ namespace
 static const std::string MC_OPENARM_DESCRIPTION_PATH = "@MC_OPENARM_DESCRIPTION_PATH@";
 // URDFs generated from the xacro files of openarm_description
 static const std::string MC_OPENARM_URDF_DIR = "@MC_OPENARM_URDF_DIR@";
+// Surfaces, installed with this module: openarm_description has none
+static const std::string MC_OPENARM_RSDF_DIR = "@MC_OPENARM_RSDF_DIR@";
 
 } // namespace
 
@@ -30,11 +32,12 @@ std::string urdfPathForVersion(OpenArmVersion version)
 }
 } // namespace
 
-OpenArmRobotModule::OpenArmRobotModule(const std::string & name, OpenArmVersion version)
+OpenArmRobotModule::OpenArmRobotModule(const std::string & name, OpenArmVersion version, bool fixed)
 : mc_rbdyn::RobotModule(MC_OPENARM_DESCRIPTION_PATH, name, urdfPathForVersion(version))
 {
-  bool fixed = true;
+  // The URDF's first link is "world", with openarm_body_link0 fixed on it at identity: a free root moves the pedestal
   init(rbd::parsers::from_urdf_file(urdf_path, fixed));
+  rsdf_dir = MC_OPENARM_RSDF_DIR + "/" + name;
 
   const std::string leftFingerJoint = "openarm_left_finger_joint1";
   const std::string rightFingerJoint = "openarm_right_finger_joint1";
